@@ -1,0 +1,29 @@
+[
+    {
+        "id": "a683dc80431f0ee6",
+        "type": "inject",
+        "z": "3fbb662928a42584",
+        "name": "Name your Asset",
+        "props": [
+            {
+                "p": "timestamp",
+                "v": "",
+                "vt": "date"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 170,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    }
+]
