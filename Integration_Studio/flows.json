@@ -1,17 +1,109 @@
 [
     {
-        "id": "a683dc80431f0ee6",
+        "id": "a781da6f697711d2",
+        "type": "tab",
+        "label": "Asset Tokenisation",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "0231410d77b80776",
         "type": "inject",
-        "z": "3fbb662928a42584",
-        "name": "Name your Asset",
+        "z": "a781da6f697711d2",
+        "name": "",
         "props": [
             {
                 "p": "timestamp",
                 "v": "",
                 "vt": "date"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 210,
+        "y": 80,
+        "wires": [
+            [
+                "8154b1dd0912e484"
+            ]
+        ]
+    },
+    {
+        "id": "8154b1dd0912e484",
+        "type": "function",
+        "z": "a781da6f697711d2",
+        "name": "Set Global Variables",
+        "func": "const glbVar = {\n    privateKey: '',\n    contract: '',\n    bpassKey: '',\n    rpcEndpoint: '',\n    abi: []\n}\n\nglobal.set('privateKey', glbVar.privateKey);\nglobal.set('contract', glbVar.contract);\nglobal.set('bpassKey', glbVar.bpassKey);\nglobal.set('rpcEndpoint', glbVar.rpcEndpoint);\nglobal.set('abi',glbVar.abi)\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 80,
+        "wires": [
+            [
+                "a7c63a0fd0d1a779"
+            ]
+        ]
+    },
+    {
+        "id": "a7c63a0fd0d1a779",
+        "type": "debug",
+        "z": "a781da6f697711d2",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 760,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "a3bf422b89eaf40e",
+        "type": "http in",
+        "z": "a781da6f697711d2",
+        "name": "Initialise Asset",
+        "url": "/initialise",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 140,
+        "wires": [
+            [
+                "a9c266c0127bcb1a"
+            ]
+        ]
+    },
+    {
+        "id": "7b77a930a3755dfb",
+        "type": "inject",
+        "z": "a781da6f697711d2",
+        "name": "",
+        "props": [
+            {
+                "p": "assetName",
+                "v": "",
+                "vt": "str"
             },
             {
-                "p": "topic",
+                "p": "assetSymbol",
+                "v": "",
+                "vt": "str"
+            },
+            {
+                "p": "assetUri",
+                "v": "",
                 "vt": "str"
             }
         ],
@@ -20,10 +112,565 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 170,
-        "y": 180,
+        "x": 210,
+        "y": 200,
         "wires": [
-            []
+            [
+                "a9c266c0127bcb1a"
+            ]
         ]
+    },
+    {
+        "id": "a9c266c0127bcb1a",
+        "type": "function",
+        "z": "a781da6f697711d2",
+        "name": "Initialise Asset",
+        "func": "///////////////////////////////////////////////////////////\n// Configuration                                         //\n///////////////////////////////////////////////////////////\n\nconst bpassKey = global.get('bpassKey');\nconst rpcEndpoint = global.get('rpcEndpoint');\nconst privateKey = global.get('privateKey');\nconst contractAddress = global.get('contract');\nconst abi = global.get('abi')\n\n///////////////////////////////////////////////////////////\n// Logic                                                 //\n///////////////////////////////////////////////////////////\n\nconst provider = new ethers.providers.JsonRpcProvider(`${rpcEndpoint}/${bpassKey}`);\nconst signer = new ethers.Wallet(privateKey, provider)\nconst contract = new ethers.Contract(contractAddress, abi, signer);\n\nconst tx = await contract.initialize(msg.assetName,msg.assetSymbol,msg.assetUri);\n\nmsg.tx = tx;\nmsg.payload = { hash: tx.hash};\n\n///////////////////////////////////////////////////////////\n// End                                                   //\n///////////////////////////////////////////////////////////\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "ethers",
+                "module": "ethers"
+            }
+        ],
+        "x": 440,
+        "y": 200,
+        "wires": [
+            [
+                "fccc870e4d37747a",
+                "e6ac0147c62409c5"
+            ]
+        ]
+    },
+    {
+        "id": "fccc870e4d37747a",
+        "type": "debug",
+        "z": "a781da6f697711d2",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 760,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "e6ac0147c62409c5",
+        "type": "http response",
+        "z": "a781da6f697711d2",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 770,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "5d247bc6cf6cbe71",
+        "type": "http in",
+        "z": "a781da6f697711d2",
+        "name": "Create Asset",
+        "url": "/createAsset",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 190,
+        "y": 380,
+        "wires": [
+            [
+                "d2b66c8a9936d187"
+            ]
+        ]
+    },
+    {
+        "id": "34a89b0416bc6b81",
+        "type": "inject",
+        "z": "a781da6f697711d2",
+        "name": "",
+        "props": [
+            {
+                "p": "assetId",
+                "v": "",
+                "vt": "num"
+            },
+            {
+                "p": "maxSupply",
+                "v": "",
+                "vt": "num"
+            },
+            {
+                "p": "faceValue",
+                "v": "",
+                "vt": "num"
+            },
+            {
+                "p": "maturityTimestamp",
+                "v": "",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 210,
+        "y": 440,
+        "wires": [
+            [
+                "d2b66c8a9936d187"
+            ]
+        ]
+    },
+    {
+        "id": "d2b66c8a9936d187",
+        "type": "function",
+        "z": "a781da6f697711d2",
+        "name": "Create Asset",
+        "func": "///////////////////////////////////////////////////////////\n// Configuration                                         //\n///////////////////////////////////////////////////////////\n\nconst bpassKey = global.get('bpassKey');\nconst rpcEndpoint = global.get('rpcEndpoint');\nconst privateKey = global.get('privateKey');\nconst contractAddress = global.get('contract');\nconst abi = global.get('abi')\n\n///////////////////////////////////////////////////////////\n// Logic                                                 //\n///////////////////////////////////////////////////////////\n\nconst provider = new ethers.providers.JsonRpcProvider(`${rpcEndpoint}/${bpassKey}`);\nconst signer = new ethers.Wallet(privateKey, provider)\nconst contract = new ethers.Contract(contractAddress, abi, signer);\n\nconst tx = await contract.createAsset(msg.assetId, msg.maxSupply, msg.faceValue, msg.maturityTimestamp);\n\nmsg.tx = tx;\nmsg.payload = { hash: tx.hash};\n\n///////////////////////////////////////////////////////////\n// End                                                   //\n///////////////////////////////////////////////////////////\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "ethers",
+                "module": "ethers"
+            }
+        ],
+        "x": 440,
+        "y": 440,
+        "wires": [
+            [
+                "044fdcbdfdcd7a04",
+                "30a836f0c70cd525"
+            ]
+        ]
+    },
+    {
+        "id": "044fdcbdfdcd7a04",
+        "type": "debug",
+        "z": "a781da6f697711d2",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 760,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "30a836f0c70cd525",
+        "type": "http response",
+        "z": "a781da6f697711d2",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 770,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "c23e1cab7499043b",
+        "type": "inject",
+        "z": "a781da6f697711d2",
+        "name": "",
+        "props": [
+            {
+                "p": "timestamp",
+                "v": "",
+                "vt": "date"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 210,
+        "y": 320,
+        "wires": [
+            [
+                "23c87abb19d043c5"
+            ]
+        ]
+    },
+    {
+        "id": "23c87abb19d043c5",
+        "type": "function",
+        "z": "a781da6f697711d2",
+        "name": "Current Time + 10 Minutes",
+        "func": "const start = msg.timestamp; // 2018-01-01 00:00:00\nconst end = msg.timestamp + 60 * 10; // 2018-02-10 00:00:00\n\nmsg.end = end;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 320,
+        "wires": [
+            [
+                "f0aa49d74372ee5f",
+                "57092e2536312a66"
+            ]
+        ]
+    },
+    {
+        "id": "f0aa49d74372ee5f",
+        "type": "debug",
+        "z": "a781da6f697711d2",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 760,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "905a9d8acd2ffc25",
+        "type": "http in",
+        "z": "a781da6f697711d2",
+        "name": "Get Maturity Time",
+        "url": "/initialise",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 260,
+        "wires": [
+            [
+                "23c87abb19d043c5"
+            ]
+        ]
+    },
+    {
+        "id": "57092e2536312a66",
+        "type": "http response",
+        "z": "a781da6f697711d2",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 770,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "3c4575afe9674c7d",
+        "type": "http in",
+        "z": "a781da6f697711d2",
+        "name": "Mint",
+        "url": "/mintAsset",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 210,
+        "y": 620,
+        "wires": [
+            [
+                "396467b890506b70"
+            ]
+        ]
+    },
+    {
+        "id": "91ddbb58a215cbc4",
+        "type": "inject",
+        "z": "a781da6f697711d2",
+        "name": "",
+        "props": [
+            {
+                "p": "assetId",
+                "v": "",
+                "vt": "num"
+            },
+            {
+                "p": "amounts",
+                "v": "",
+                "vt": "num"
+            },
+            {
+                "p": "recipient",
+                "v": "",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 210,
+        "y": 680,
+        "wires": [
+            [
+                "396467b890506b70"
+            ]
+        ]
+    },
+    {
+        "id": "396467b890506b70",
+        "type": "function",
+        "z": "a781da6f697711d2",
+        "name": "Mint Asset",
+        "func": "///////////////////////////////////////////////////////////\n// Configuration                                         //\n///////////////////////////////////////////////////////////\n\nconst bpassKey = global.get('bpassKey');\nconst rpcEndpoint = global.get('rpcEndpoint');\nconst privateKey = global.get('privateKey');\nconst contractAddress = global.get('contract');\nconst abi = global.get('abi')\n\n///////////////////////////////////////////////////////////\n// Logic                                                 //\n///////////////////////////////////////////////////////////\n\nconst provider = new ethers.providers.JsonRpcProvider(`${rpcEndpoint}/${bpassKey}`);\nconst signer = new ethers.Wallet(privateKey, provider)\nconst contract = new ethers.Contract(contractAddress, abi, signer);\n\nconst tx = await contract.mint(msg.assetId, msg.amounts, msg.recipient);\n\nmsg.tx = tx;\nmsg.payload = { hash: tx.hash};\n\n///////////////////////////////////////////////////////////\n// End                                                   //\n///////////////////////////////////////////////////////////\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "ethers",
+                "module": "ethers"
+            }
+        ],
+        "x": 430,
+        "y": 680,
+        "wires": [
+            [
+                "800e2f3264dfcd5a",
+                "8973a39a370872a0"
+            ]
+        ]
+    },
+    {
+        "id": "800e2f3264dfcd5a",
+        "type": "debug",
+        "z": "a781da6f697711d2",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 760,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "8973a39a370872a0",
+        "type": "http response",
+        "z": "a781da6f697711d2",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 770,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "736e61d2a897367f",
+        "type": "http in",
+        "z": "a781da6f697711d2",
+        "name": "View Balance",
+        "url": "/viewBalance",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 740,
+        "wires": [
+            [
+                "79c13e182da793bf"
+            ]
+        ]
+    },
+    {
+        "id": "4a5021a501f7fa28",
+        "type": "inject",
+        "z": "a781da6f697711d2",
+        "name": "",
+        "props": [
+            {
+                "p": "address",
+                "v": "",
+                "vt": "str"
+            },
+            {
+                "p": "id",
+                "v": "",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 210,
+        "y": 800,
+        "wires": [
+            [
+                "79c13e182da793bf"
+            ]
+        ]
+    },
+    {
+        "id": "79c13e182da793bf",
+        "type": "function",
+        "z": "a781da6f697711d2",
+        "name": "View Balance",
+        "func": "///////////////////////////////////////////////////////////\n// Configuration                                         //\n///////////////////////////////////////////////////////////\n\nconst bpassKey = global.get('bpassKey');\nconst rpcEndpoint = global.get('rpcEndpoint');\nconst privateKey = global.get('privateKey');\nconst contractAddress = global.get('contract');\nconst abi = global.get('abi')\n\n///////////////////////////////////////////////////////////\n// Logic                                                 //\n///////////////////////////////////////////////////////////\n\nconst provider = new ethers.providers.JsonRpcProvider(`${rpcEndpoint}/${bpassKey}`);\nconst signer = new ethers.Wallet(privateKey, provider)\nconst contract = new ethers.Contract(contractAddress, abi, signer);\n\nconst tx = await contract.balanceOf(msg.address, msg.id);\n\nmsg.tx = tx;\nmsg.payload = { hash: tx.hash};\n\n///////////////////////////////////////////////////////////\n// End                                                   //\n///////////////////////////////////////////////////////////\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "ethers",
+                "module": "ethers"
+            }
+        ],
+        "x": 440,
+        "y": 800,
+        "wires": [
+            [
+                "2a6a5fc7f077b330",
+                "4d5d69f4484e672a"
+            ]
+        ]
+    },
+    {
+        "id": "2a6a5fc7f077b330",
+        "type": "debug",
+        "z": "a781da6f697711d2",
+        "name": "debug 7",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 760,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "4d5d69f4484e672a",
+        "type": "http response",
+        "z": "a781da6f697711d2",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 770,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "d4cda817f22bae82",
+        "type": "http in",
+        "z": "a781da6f697711d2",
+        "name": "View Asset",
+        "url": "/viewAsset",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 190,
+        "y": 500,
+        "wires": [
+            [
+                "2da7906165d6d5a3"
+            ]
+        ]
+    },
+    {
+        "id": "95939c685c83f962",
+        "type": "inject",
+        "z": "a781da6f697711d2",
+        "name": "",
+        "props": [
+            {
+                "p": "assetId",
+                "v": "",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 210,
+        "y": 560,
+        "wires": [
+            [
+                "2da7906165d6d5a3"
+            ]
+        ]
+    },
+    {
+        "id": "2da7906165d6d5a3",
+        "type": "function",
+        "z": "a781da6f697711d2",
+        "name": "View Asset",
+        "func": "///////////////////////////////////////////////////////////\n// Configuration                                         //\n///////////////////////////////////////////////////////////\n\nconst bpassKey = global.get('bpassKey');\nconst rpcEndpoint = global.get('rpcEndpoint');\nconst privateKey = global.get('privateKey');\nconst contractAddress = global.get('contract');\nconst abi = global.get('abi')\n\n///////////////////////////////////////////////////////////\n// Logic                                                 //\n///////////////////////////////////////////////////////////\n\nconst provider = new ethers.providers.JsonRpcProvider(`${rpcEndpoint}/${bpassKey}`);\nconst signer = new ethers.Wallet(privateKey, provider)\nconst contract = new ethers.Contract(contractAddress, abi, signer);\n\nconst tx = await contract.assetToDetails(msg.assetId);\n\nmsg.tx = tx;\nmsg.payload = { hash: tx.hash};\n\n///////////////////////////////////////////////////////////\n// End                                                   //\n///////////////////////////////////////////////////////////\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "ethers",
+                "module": "ethers"
+            }
+        ],
+        "x": 430,
+        "y": 560,
+        "wires": [
+            [
+                "9844d4ddf4b294ef",
+                "a31a26d871259c19"
+            ]
+        ]
+    },
+    {
+        "id": "9844d4ddf4b294ef",
+        "type": "debug",
+        "z": "a781da6f697711d2",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 760,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "a31a26d871259c19",
+        "type": "http response",
+        "z": "a781da6f697711d2",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 770,
+        "y": 500,
+        "wires": []
     }
 ]
